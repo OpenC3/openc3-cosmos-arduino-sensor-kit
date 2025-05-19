@@ -1,0 +1,9 @@
+TELEMETRY BMP280 STATUS LITTLE_ENDIAN "BMP280 Status with Temperature, Pressure, and Altitude"
+  # Keyword      Name     BitSize Type  ID  Description
+  APPEND_ID_ITEM ID       8       UINT  1   "Identifier"
+  APPEND_ITEM    TEMP_C   32      FLOAT     "Temperature Reading"
+    UNITS Celsius C
+  APPEND_ITEM    PRESS_PA 32      FLOAT     "Barometric Pressure Reading"
+    UNITS Pascal Pa
+  APPEND_ITEM    ALT_M    32      FLOAT     "Altitude Reading"
+    UNITS Meters m
