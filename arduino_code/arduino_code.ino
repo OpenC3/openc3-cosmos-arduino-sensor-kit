@@ -3,9 +3,16 @@
 #define SYNC_PATTERN 0xABCD1234
 const uint8_t BMP280_ID = 1;
 
+#define LED 6
+
+// Global variables
+bool ledState = false;
+
 void setup() {
   Serial.begin(9600);
   Pressure.begin();
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, LOW);
 }
 
 struct __attribute__((packed)) Payload {
@@ -15,7 +22,7 @@ struct __attribute__((packed)) Payload {
   float altitude;
 };
 
-void loop() {
+void sendTelemetry() {
   // Read sensors
   float temp     = Pressure.readTemperature();
   float pressure = Pressure.readPressure();
@@ -40,7 +47,23 @@ void loop() {
 
   // Send the packet
   Serial.write(buffer, PAYLOAD_LEN);
+}
 
+void receiveCommands() {
+  while (Serial.available() > 0) {
+    int command = Serial.read();
+    if (command == 1) {
+      digitalWrite(LED, HIGH);
+    } else if (command == 0) {
+      digitalWrite(LED, LOW);
+    }
+  }
+}
+
+
+void loop() {
+  receiveCommands();
+  sendTelemetry();
   // Wait one second
   delay(1000);
 }
