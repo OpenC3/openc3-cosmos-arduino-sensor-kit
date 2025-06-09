@@ -1,6 +1,10 @@
 # OpenC3 COSMOS Arduino Sensor Kit Plugin
 COSMOS Plugin to speak to the Arduino Sensor Kit
 
+## YouTube Videos
+1. [Part 1 -- COSMOS and Arduino Sensor Kit | BMP280 | Barometric Sensor Telemetry](https://youtu.be/MtU_bPRawqk?si=cSTK1atBBmwrGer5)
+1. [Part 2 -- COSMOS and Arduino Sensor Kit | Commanding & Telemetry](https://youtu.be/T9G5QWnUJPA)
+
 ## Installing into OpenC3 COSMOS
 
 1. Go to the OpenC3 Admin Tool, Plugins Tab
