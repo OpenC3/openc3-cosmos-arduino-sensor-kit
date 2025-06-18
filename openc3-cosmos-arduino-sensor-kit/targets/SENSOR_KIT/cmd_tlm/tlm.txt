@@ -1,0 +1,24 @@
+TELEMETRY SENSOR_KIT BMP280 LITTLE_ENDIAN "BMP280 Packet with Temperature, Pressure, and Altitude"
+  # Keyword      Name     BitSize Type  ID  Description
+  APPEND_ID_ITEM ID       8       UINT  1   "Identifier"
+  APPEND_ITEM    TEMP_C   32      FLOAT     "Temperature Reading"
+    UNITS Celsius C
+  APPEND_ITEM    PRESS_PA 32      FLOAT     "Barometric Pressure Reading"
+    UNITS Pascal Pa
+  APPEND_ITEM    ALT_M    32      FLOAT     "Altitude Reading"
+    UNITS Meters m
+
+TELEMETRY SENSOR_KIT ACCELEROMETER LITTLE_ENDIAN "Accelerometer Packet with X, Y, Z positions"
+  # Keyword      Name     BitSize Type  ID  Description
+  APPEND_ID_ITEM ID       8       UINT  2   "Identifier"
+  APPEND_ITEM    X        32      FLOAT     "X Reading"
+  APPEND_ITEM    Y        32      FLOAT     "Y Reading"
+  APPEND_ITEM    Z        32      FLOAT     "Z Reading"
+
+TELEMETRY SENSOR_KIT DHT20 LITTLE_ENDIAN "DHT20 Packet with Temperature and Humidity"
+  # Keyword      Name     BitSize Type  ID  Description
+  APPEND_ID_ITEM ID       8       UINT  3   "Identifier"
+  APPEND_ITEM    TEMP_C   32      FLOAT     "Temperature Reading"
+    UNITS Celsius C
+  APPEND_ITEM    HUMIDITY 32      FLOAT     "Humidity Reading"
+    UNITS Percent %
