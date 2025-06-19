@@ -3,6 +3,7 @@ TELEMETRY SENSOR_KIT BMP280 LITTLE_ENDIAN "BMP280 Packet with Temperature, Press
   APPEND_ID_ITEM ID       8       UINT  1   "Identifier"
   APPEND_ITEM    TEMP_C   32      FLOAT     "Temperature Reading"
     UNITS Celsius C
+    LIMITS DEFAULT 3 ENABLED 15 20 25 30
   APPEND_ITEM    PRESS_PA 32      FLOAT     "Barometric Pressure Reading"
     UNITS Pascal Pa
   APPEND_ITEM    ALT_M    32      FLOAT     "Altitude Reading"
@@ -20,5 +21,11 @@ TELEMETRY SENSOR_KIT DHT20 LITTLE_ENDIAN "DHT20 Packet with Temperature and Humi
   APPEND_ID_ITEM ID       8       UINT  3   "Identifier"
   APPEND_ITEM    TEMP_C   32      FLOAT     "Temperature Reading"
     UNITS Celsius C
+    LIMITS DEFAULT 3 ENABLED 15 20 25 30
   APPEND_ITEM    HUMIDITY 32      FLOAT     "Humidity Reading"
     UNITS Percent %
+
+TELEMETRY SENSOR_KIT SOUND LITTLE_ENDIAN "Sound Packet with Sound"
+  # Keyword      Name     BitSize Type  ID  Description
+  APPEND_ID_ITEM ID       8       UINT  4   "Identifier"
+  APPEND_ITEM    SOUND    16      INT       "Sound Reading"

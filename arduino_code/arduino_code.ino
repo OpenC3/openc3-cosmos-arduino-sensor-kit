@@ -1,16 +1,20 @@
 #include "Arduino_SensorKit.h"
 
 #define SYNC_PATTERN 0xABCD1234
+#define START_BYTE 0x11
+#define BUZZER 5
 #define Environment Environment_I2C
 
 const uint8_t BMP280_ID = 1;
 const uint8_t ACCELEROMETER_ID = 2;
 const uint8_t DHT20_ID = 3;
+const uint8_t SOUND_ID = 4;
 
 #define LED 6
 
 // Global variables
 bool ledState = false;
+int sound_sensor = A2;
 
 void setup() {
   Serial.begin(9600);
@@ -18,6 +22,7 @@ void setup() {
   Accelerometer.begin();
   Environment.begin();
   pinMode(LED, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   digitalWrite(LED, LOW);
 }
 
@@ -41,6 +46,38 @@ struct __attribute__((packed)) DHT_Payload {
   float humidity;
 };
 
+struct __attribute__((packed)) Sound_Payload {
+  uint8_t id;
+  int soundValue;
+};
+
+void sendSoundTelemetry() {
+  int soundValue = 0; //create variable to store many different readings
+  for (int i = 0; i < 32; i++) //create a for loop to read 
+  { soundValue += analogRead(sound_sensor);  } //read the sound sensor
+ 
+  soundValue >>= 5; //bitshift operation 
+
+  Sound_Payload data = { SOUND_ID, soundValue };
+
+  int SOUND_PAYLOAD_LEN = sizeof(uint32_t) + 1 + sizeof(Sound_Payload);
+  uint8_t buffer[SOUND_PAYLOAD_LEN];
+
+  // Sets sync data
+  uint32_t sync = SYNC_PATTERN;
+  memcpy(buffer, &sync, sizeof(sync));
+
+  // Sets the length of data
+  uint8_t length = sizeof(Sound_Payload);
+  buffer[sizeof(sync)] = length;
+
+  // Sets the data
+  memcpy(buffer + sizeof(sync) + 1, &data, sizeof(Sound_Payload));
+
+  // Send the packet
+  Serial.write(buffer, SOUND_PAYLOAD_LEN);
+}
+
 void sendDHTTelemetry() {
   // Read sensors
   float temp = Environment.readTemperature();
@@ -56,7 +93,7 @@ void sendDHTTelemetry() {
   memcpy(buffer, &sync, sizeof(sync));
 
   // Sets the length of data
-  uint8_t length = sizeof(DHT_Payload); // 13
+  uint8_t length = sizeof(DHT_Payload);
   buffer[sizeof(sync)] = length;
 
   // Sets the data
@@ -82,7 +119,7 @@ void sendAccTelemetry() {
   memcpy(buffer, &sync, sizeof(sync));
 
   // Sets the length of data
-  uint8_t length = sizeof(Acc_Payload); // 13
+  uint8_t length = sizeof(Acc_Payload);
   buffer[sizeof(sync)] = length;
 
   // Sets the data
@@ -109,7 +146,7 @@ void sendBMPTelemetry() {
   memcpy(buffer, &sync, sizeof(sync));
 
   // Sets the length of data
-  uint8_t length = sizeof(BMP_Payload); // 13
+  uint8_t length = sizeof(BMP_Payload);
   buffer[sizeof(sync)] = length;
 
   // Sets the data
@@ -120,22 +157,39 @@ void sendBMPTelemetry() {
 }
 
 void receiveCommands() {
-  while (Serial.available() > 0) {
-    int command = Serial.read();
-    if (command == 1) {
-      digitalWrite(LED, HIGH);
-    } else if (command == 0) {
-      digitalWrite(LED, LOW);
+  while (Serial.available() >= 3) {
+    if (Serial.read() == START_BYTE) {
+      byte cmdId = Serial.read();
+      byte arg = Serial.read();
+
+      switch(cmdId) {
+        case 0x01:
+          if (arg == 0x00) {
+            digitalWrite(LED, LOW);
+          } else {
+            digitalWrite(LED, HIGH);
+          }
+          break;
+        case 0x02:
+          if (arg == 0x00) {
+            noTone(BUZZER);
+          } else {
+            tone(BUZZER, 85);
+          }
+          break;
+        default:
+          continue;
+      }
     }
   }
 }
-
 
 void loop() {
   receiveCommands();
   sendBMPTelemetry();
   sendAccTelemetry();
   sendDHTTelemetry();
+  sendSoundTelemetry();
   // Wait one second
   delay(1000);
 }
