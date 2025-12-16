@@ -19,7 +19,7 @@ COSMOS Plugin to speak to the Arduino Sensor Kit
 1. While the Arduino is plugged into your machine, find the port that it is plugged into (your Arduino IDE will likely display this)
 1. Launch COSMOS to your machine (see: [Getting Started](https://docs.openc3.com/docs/getting-started/installation) for more details)
 1. Form a bridge from your serial connection to your Docker container
-1. `openc3cli bridgegem openc3-cosmos-bridge-serial router_port=2950 write_port_name=nil read_port_name=PUT_YOUR_PORT_FROM_STEP2_HERE baud_rate=9600 parity=NONE`
+1. `openc3cli bridgegem openc3-cosmos-bridge-serial router_port=2950 write_port_name=PUT_YOUR_PORT_FROM_STEP2_HERE read_port_name=PUT_YOUR_PORT_FROM_STEP2_HERE baud_rate=9600 parity=NONE`
 1. Install the plugin in COSMOS through the Admin Console
 
 ## Contributing
