@@ -9,7 +9,10 @@ const uint8_t BMP280_ID = 1;
 const uint8_t ACCELEROMETER_ID = 2;
 const uint8_t DHT20_ID = 3;
 const uint8_t SOUND_ID = 4;
+const uint8_t OLED_ID = 5;
 
+// The OLED is 16 characters wide with the chroma48medium8 font
+const uint8_t OLED_COLUMNS = 16;
 #define LED 6
 
 // Global variables
@@ -24,6 +27,8 @@ void setup() {
   pinMode(LED, OUTPUT);
   pinMode(BUZZER, OUTPUT);
   digitalWrite(LED, LOW);
+  Oled.begin();
+  Oled.setFlipMode(true); // Sets the rotation of the screen
 }
 
 struct __attribute__((packed)) BMP_Payload {
@@ -50,6 +55,14 @@ struct __attribute__((packed)) Sound_Payload {
   uint8_t id;
   int soundValue;
 };
+
+struct __attribute__((packed)) OLED_Payload {
+  uint8_t id;
+  int16_t temp;
+  int16_t humidity;
+
+};
+
 
 void sendSoundTelemetry() {
   int soundValue = 0; //create variable to store many different readings
@@ -156,6 +169,52 @@ void sendBMPTelemetry() {
   Serial.write(buffer, BMP_PAYLOAD_LEN);
 }
 
+void sendOLEDTelemetry() {
+  // Read sensors
+  int16_t humidity = Environment.readHumidity();
+  int16_t temp = Environment.readTemperature();
+
+  // Draw the each line padded to full width so a shrinking value doesn't
+  // leave stale digits behind (65 -> 9 would otherwise read "95")
+  char temp_line[OLED_COLUMNS + 1];
+  snprintf(temp_line, sizeof(temp_line), "Temp: %d C", temp);
+  for (uint8_t i = strlen(temp_line); i < OLED_COLUMNS; i++) temp_line[i] = ' ';
+  temp_line[OLED_COLUMNS] = '\0';
+
+  char humidity_line[OLED_COLUMNS + 2];
+  snprintf(humidity_line, sizeof(humidity_line), "Humidity: %d%%", humidity);
+  for (uint8_t i = strlen(humidity_line); i < OLED_COLUMNS; i++) humidity_line[i] = ' ';
+  humidity_line[OLED_COLUMNS] = '\0';
+
+
+  Oled.setFont(u8x8_font_chroma48medium8_r);
+  Oled.setCursor(0, 0);      // Set the Coordinates for the first line
+  Oled.print(temp_line);     // Print the temp
+  Oled.setCursor(0, 10);     // Set the Coordinates for the second line
+  Oled.print(humidity_line); // Print the humidity
+  Oled.refreshDisplay();     // Update the Display
+
+  // Send the same label the display shows so the two can't drift apart
+  OLED_Payload data = { OLED_ID, temp, humidity };
+
+  int OLED_PAYLOAD_LEN = sizeof(uint32_t) + 1 + sizeof(OLED_Payload);
+  uint8_t buffer[OLED_PAYLOAD_LEN];
+
+  // Sets sync data
+  uint32_t sync = SYNC_PATTERN;
+  memcpy(buffer, &sync, sizeof(sync));
+
+  // Sets the length of data
+  uint8_t length = sizeof(OLED_Payload);
+  buffer[sizeof(sync)] = length;
+
+  // Sets the data
+  memcpy(buffer + sizeof(sync) + 1, &data, sizeof(OLED_Payload));
+
+  // Send the packet
+  Serial.write(buffer, OLED_PAYLOAD_LEN);
+}
+
 void receiveCommands() {
   while (Serial.available() >= 3) {
     if (Serial.read() == START_BYTE) {
@@ -190,6 +249,7 @@ void loop() {
   sendAccTelemetry();
   sendDHTTelemetry();
   sendSoundTelemetry();
+  sendOLEDTelemetry();
   // Wait one second
   delay(1000);
 }
