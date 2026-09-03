@@ -58,8 +58,9 @@ struct __attribute__((packed)) Sound_Payload {
 
 struct __attribute__((packed)) OLED_Payload {
   uint8_t id;
-  int16_t humidity;
   int16_t temp;
+  int16_t humidity;
+
 };
 
 

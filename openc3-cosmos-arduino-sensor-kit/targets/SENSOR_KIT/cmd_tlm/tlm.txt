@@ -32,12 +32,12 @@ TELEMETRY SENSOR_KIT SOUND LITTLE_ENDIAN "Sound Packet with Sound"
   APPEND_ID_ITEM ID       8       UINT  4   "Identifier"
   APPEND_ITEM    SOUND    16      INT       "Sound Reading"
 
-TELEMETRY SENSOR_KIT OLED LITTLE_ENDIAN "OLED Packet with the label and value shown on the display"
+TELEMETRY SENSOR_KIT OLED LITTLE_ENDIAN "OLED Packet with Temperature and Humidity on display"
   # Keyword      Name     BitSize Type   ID  Description
   APPEND_ID_ITEM ID       8       UINT   5   "Identifier"
   APPEND_ITEM    TEMP_C   16      INT        "Temperature Reading"
     UNITS Celsius C
     LIMITS DEFAULT 3 ENABLED 15 20 26 27 22 25
-  APPEND_ITEM    HUMIDITY 16      INT        "Humidity value shown on the OLED"
+  APPEND_ITEM    HUMIDITY 16      INT        "Humidity Reading"
     UNITS Percent %
   
